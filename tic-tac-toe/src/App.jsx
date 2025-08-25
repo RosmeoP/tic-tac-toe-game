@@ -1,9 +1,14 @@
 import { useState } from 'react'
 
 function Square({ value, onSquareClick }) {
+  const getSquareClass = () => {
+    if (!value) return "w-20 h-20 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 text-3xl font-bold shadow-md transition-all duration-200 transform hover:scale-105";
+    return `w-20 h-20 rounded-lg ${value === 'X' ? 'bg-gradient-to-r from-blue-400 to-indigo-500 text-white' : 'bg-gradient-to-r from-pink-400 to-rose-500 text-white'} text-3xl font-bold shadow-md`;
+  };
+
   return (
     <button 
-      className="w-16 h-16 border border-gray-400 bg-white text-2xl font-bold flex items-center justify-center" 
+      className={getSquareClass()}
       onClick={onSquareClick}
     >
       {value}
@@ -23,18 +28,25 @@ function Board({ squares, xIsNext, onPlay }) {
 
   const winner = calculateWinner(squares);
   let status;
+  let statusClass = "text-2xl font-bold mb-6 py-3 px-6 rounded-full";
+  
   if (winner) {
-    status = `Winner: ${winner}`;
+    status = `${winner} Wins!`;
+    statusClass += winner === 'X' ? " bg-blue-500 text-white" : " bg-rose-500 text-white";
   } else if (squares.every(square => square)) {
-    status = 'Game ended in a draw!';
+    status = 'Draw!';
+    statusClass += " bg-amber-500 text-white";
   } else {
-    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+    status = `${xIsNext ? 'X' : 'O'}'s Turn`;
+    statusClass += xIsNext 
+      ? " bg-gradient-to-r from-blue-400 to-indigo-500 text-white"
+      : " bg-gradient-to-r from-pink-400 to-rose-500 text-white";
   }
 
   return (
     <div className="flex flex-col items-center">
-      <div className="text-xl font-bold mb-4">{status}</div>
-      <div className="grid grid-cols-3 gap-1">
+      <div className={statusClass}>{status}</div>
+      <div className="grid grid-cols-3 gap-3 p-4">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <Square key={i} value={squares[i]} onSquareClick={() => handleClick(i)} />
         ))}
@@ -60,12 +72,18 @@ function App() {
   }
 
   const moves = history.map((squares, move) => {
-    const description = move ? `Go to move #${move}` : 'Go to game start';
+    const description = move ? `Move #${move}` : 'Start';
+    const isCurrent = move === currentMove;
     return (
-      <li key={move} className="my-1">
+      <li key={move} className="my-2">
         <button 
           onClick={() => jumpTo(move)}
-          className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
+          className={`py-2 px-4 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${
+            isCurrent 
+            ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg ring-2 ring-purple-300' 
+            : 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-700 hover:from-slate-300 hover:to-slate-400'
+          }`}
+          disabled={isCurrent}
         >
           {description}
         </button>
@@ -74,15 +92,36 @@ function App() {
   });
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen p-4 gap-8">
-      <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">Tic Tac Toe</h1>
-        <Board squares={currentSquares} xIsNext={xIsNext} onPlay={handlePlay} />
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-slate-50 to-slate-100">
+      <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-8 tracking-tight">
+        Tic Tac Toe
+      </h1>
+      
+      <div className="flex flex-col lg:flex-row items-start justify-center gap-10">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100">
+          <Board squares={currentSquares} xIsNext={xIsNext} onPlay={handlePlay} />
+        </div>
+        
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100 w-full lg:w-auto">
+          <h2 className="text-2xl font-bold mb-4 text-indigo-700">Game History</h2>
+          <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+            <ol className="space-y-2">{moves}</ol>
+          </div>
+          
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <button
+              onClick={() => setHistory([Array(9).fill(null)]) || setCurrentMove(0)}
+              className="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-lg shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all duration-300"
+            >
+              New Game
+            </button>
+          </div>
+        </div>
       </div>
-      <div className="mt-4 md:mt-0">
-        <h2 className="text-xl font-bold mb-2">Game History</h2>
-        <ol className="list-decimal pl-6">{moves}</ol>
-      </div>
+      
+      <footer className="mt-8 text-slate-500 text-sm">
+        Created with React • {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }
