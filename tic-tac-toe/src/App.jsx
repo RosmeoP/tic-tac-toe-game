@@ -93,28 +93,34 @@ function App() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-slate-50 to-slate-100">
-      <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-8 tracking-tight">
-        Tic Tac Toe
-      </h1>
-      
-      <div className="flex flex-col lg:flex-row items-start justify-center gap-10">
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100">
-          <Board squares={currentSquares} xIsNext={xIsNext} onPlay={handlePlay} />
+      <div className="w-full max-w-6xl px-4">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-8">
+          <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
+            Tic Tac Toe
+          </h1>
+          
+          {/* Game History - Now positioned top right on desktop */}
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-indigo-100 mt-6 lg:mt-0 w-full lg:w-auto">
+            <h2 className="text-xl font-bold mb-3 text-indigo-700">Game History</h2>
+            <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+              <ol className="space-y-2">{moves}</ol>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-slate-200">
+              <button
+                onClick={() => setHistory([Array(9).fill(null)]) || setCurrentMove(0)}
+                className="w-full py-2 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-lg shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all duration-300"
+              >
+                New Game
+              </button>
+            </div>
+          </div>
         </div>
         
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100 w-full lg:w-auto">
-          <h2 className="text-2xl font-bold mb-4 text-indigo-700">Game History</h2>
-          <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-            <ol className="space-y-2">{moves}</ol>
-          </div>
-          
-          <div className="mt-6 pt-6 border-t border-slate-200">
-            <button
-              onClick={() => setHistory([Array(9).fill(null)]) || setCurrentMove(0)}
-              className="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-lg shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all duration-300"
-            >
-              New Game
-            </button>
+        {/* Game Board - Centered below */}
+        <div className="flex justify-center">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100">
+            <Board squares={currentSquares} xIsNext={xIsNext} onPlay={handlePlay} />
           </div>
         </div>
       </div>
